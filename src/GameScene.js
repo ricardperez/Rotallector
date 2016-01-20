@@ -3,27 +3,27 @@
  */
 
 var Physics = function () {
-    this.scale = 30;
+    this.scale = 1;
 
     var worldAABB = new Box2D.Collision.b2AABB();
     worldAABB.lowerBound.Set(0, 0);
     worldAABB.upperBound.Set(cc.winSize.width * this.scale, cc.winSize.height * this.scale);
 
-    var gravity = new Box2D.Common.Math.b2Vec2(0, 100);
+    var gravity = new Box2D.Common.Math.b2Vec2(0, -100);
     var doSleep = true;
 
     this.world = new Box2D.Dynamics.b2World(gravity, doSleep);
 
-    this.screenToPhysics = function (screenX, screenY) {
-        var x = screenX / this.scale;
-        var y = screenY / this.scale;
+    this.screenToPhysics = function (position) {
+        var x = position.x / this.scale;
+        var y = position.y / this.scale;
 
         return new Box2D.Common.Math.b2Vec2(x, y);
     };
 
-    this.physicsToScreen = function (physicsX, physicsY) {
-        var y = physicsX * this.scale;
-        var x = physicsY * this.scale;
+    this.physicsToScreen = function (position) {
+        var x = position.x * this.scale;
+        var y = position.y * this.scale;
 
         return new cc.Point(x, y);
     };
@@ -33,21 +33,18 @@ var Physics = function () {
 
         var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1000.0;
+        fixtureDef.density = 10.0;
         fixtureDef.restitution = 0.2;
         fixtureDef.friction = 0.5;
         fixtureDef.m_radius = radius / this.scale;
 
         var bodyDef = new Box2D.Dynamics.b2BodyDef();
         bodyDef.m_type = Box2D.Dynamics.b2Body.b2_dynamicBody;
-        bodyDef.position = this.screenToPhysics(screenPosition.x, screenPosition.y);
+        bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
+        bodyDef.position = this.screenToPhysics(screenPosition);
 
         var body = this.world.CreateBody(bodyDef);
         body.CreateFixture(fixtureDef);
-
-        body.ApplyImpulse(new Box2D.Common.Math.b2Vec2(10000, 0), bodyDef.position);
-
-        console.log("Creating a ball at (" + bodyDef.position.x + ", " + bodyDef.position.y + ") with radius " + fixtureDef.m_radius)
 
         return body;
     };
@@ -57,32 +54,15 @@ var Physics = function () {
         var iteration = 1;
         this.world.Step(timeStep, 10, 10);
 
-        console.log('N bodies: ' + this.world.GetBodyCount());
-        var i = 0;
-        for (var body = this.world.m_bodyList; body; body = body.m_next) {
-            console.log('  body #' + i);
-            console.log('    position: (' + body.GetPosition().x + ', ' + body.GetPosition().y + ')');
-            var nFixtures = 0;
-            for (var f = body.GetFixtureList(); f; f = f.m_next) {
-                nFixtures++;
-            }
-            console.log('    n fixtures: ' + nFixtures);
-            if (nFixtures > 0)
-            {
-                var fixture = body.GetFixtureList();
-                console.log('    Fixture type: ' + fixture.GetType());
-                console.log('    Fixture shape: ' + fixture.GetShape());
-                console.log('    Fixture density: ' + fixture.GetDensity());
-            }
-            i++;
-        }
+        this.world.DrawDebugData();
     };
 }
 
 var GameScene = cc.Scene.extend({
 
     physics: new Physics(),
-    ball: null,
+    balls: [],
+    nBalls: 5,
 
     ctor: function () {
         this._super();
@@ -90,17 +70,18 @@ var GameScene = cc.Scene.extend({
         var whiteBackgroundLayer = new cc.LayerColor(new cc.Color(255, 255, 255), this.getContentSize().width, this.getContentSize().height);
         this.addChild(whiteBackgroundLayer);
 
-        var screenPosition = new cc.Point(this.getContentSize().width * 0.5, this.getContentSize().height * 0.5);
+        for (var i = 0; i < this.nBalls; ++i) {
+            var posX = this.getContentSize().width * Math.random();
+            var posY = this.getContentSize().height * Math.random();
+            var screenPosition = new cc.Point(posX, posY);
+            var ball = new Ball(screenPosition, this.physics);
+            this.balls.push(ball);
+            this.addChild(ball.sprite);
+        }
+    },
 
-        var sprite = new cc.Sprite(GameScene.resources.Ball);
-        sprite.setPosition(screenPosition);
-        sprite.setColor(new cc.Color(255, 0, 0, 255));
-        this.addChild(sprite);
-
-        var radius = sprite.getContentSize().width * 0.5;
-        var body = this.physics.createBallBody(sprite.getContentSize().width * 0.5, screenPosition);
-
-        this.ball = new Ball(sprite, body, this.physics);
+    onEnterTransitionDidFinish: function () {
+        this._super();
 
         this.scheduleUpdate();
     },
@@ -109,26 +90,52 @@ var GameScene = cc.Scene.extend({
         this._super();
 
         this.physics.step();
-        this.ball.update(dt);
+
+        for (var i = 0; i < this.balls.length; i++) {
+            this.balls[i].update(dt);
+        }
     }
 });
 
-var Ball = function (sprite, body, physics) {
-    this.sprite = sprite;
-    this.body = body;
+var Ball = function (position, physics) {
+
     this.physics = physics;
 
+    this.sprite = new cc.Sprite(GameScene.resources.Ball);
+    this.sprite.setPosition(position);
+    this.sprite.setColor(Ball.Colors[Math.floor(Math.random() * Ball.Colors.length)]);
+
+    var radius = this.sprite.getContentSize().width * 0.5;
+    this.body = this.physics.createBallBody(radius, position);
+
     this.update = function (dt) {
-        var screenPos = this.physics.physicsToScreen(this.body.GetPosition().x, this.body.GetPosition().y);
+        var screenPos = this.physics.physicsToScreen(this.body.GetPosition());
         this.sprite.setPosition(screenPos);
+
+        if (this.body.GetPosition().y < 0) {
+            var x = this.sprite.getPosition().x;
+            var screenPosition = new cc.Point(x, cc.winSize.height);
+            this.body.SetPosition(this.physics.screenToPhysics(screenPosition));
+        }
     }
 };
 
+Ball.Colors = [
+    new cc.Color(255, 0, 0, 255),
+    new cc.Color(0, 255, 0, 255),
+    new cc.Color(0, 0, 255, 255),
+    new cc.Color(255, 255, 255, 255),
+    new cc.Color(255, 255, 0, 255),
+    new cc.Color(255, 0, 255, 255),
+    new cc.Color(0, 255, 255, 255),
+];
+
 GameScene.resources = {
     Ball: "res/ball.png"
-}
+};
 
 GameScene.g_resources = [];
 for (var i in GameScene.resources) {
     GameScene.g_resources.push(GameScene.resources[i]);
 }
+
