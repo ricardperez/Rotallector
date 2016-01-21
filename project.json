@@ -18,6 +18,9 @@
     "jsList" : [
         "src/resource.js",
         "src/app.js",
-        "src/GameScene.js"
+        "src/Ball.js",
+        "src/GameScene.js",
+        "src/Launcher.js",
+        "src/Physics.js"
     ]
 }
