@@ -5,24 +5,9 @@ var Physics = function () {
     this.scalePhysicsToScreen = 32;
     this.scaleScreenToPhysics = (1.0 / this.scalePhysicsToScreen);
 
-
     var gravity = new Box2D.Common.Math.b2Vec2(0, -9.8);
     var doSleep = true;
     this.world = new Box2D.Dynamics.b2World(gravity, doSleep);
-
-    var floorVertices = [
-        new cc.Point(0, cc.winSize.height),
-        new cc.Point(0, 0),
-        new cc.Point(cc.winSize.width, 0),
-        new cc.Point(cc.winSize.width, cc.winSize.height)
-    ];
-
-    for (var i = 0; i < floorVertices.length - 1; i++) {
-        var vertex1 = floorVertices[i];
-        var vertex2 = floorVertices[i + 1];
-
-        this.addEdge(vertex1, vertex2);
-    }
 };
 
 Physics.prototype.screenToPhysics = function (position) {
@@ -64,7 +49,7 @@ Physics.prototype.step = function () {
     this.world.Step(timeStep, 10, 10);
 };
 
-Physics.prototype.addEdge = function (vertex1, vertex2) {
+Physics.prototype.createEdge = function (vertex1, vertex2) {
     var v1 = this.screenToPhysics(vertex1);
     var v2 = this.screenToPhysics(vertex2);
 
