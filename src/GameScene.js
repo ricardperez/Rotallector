@@ -18,9 +18,9 @@ var GameScene = cc.Scene.extend({
 
         this.physics = new Physics();
         this.launcher = new Launcher(this.physics);
-        this.collector = new Collector(this.physics, new cc.Point(cc.winSize.width*0.5, 100));
+        this.collector = new Collector(this.physics, new cc.Point(cc.winSize.width * 0.5, 100));
 
-        this.setupWallsAndFloor();
+        this.setupWalls();
         this.setupLauncher();
         this.setupCollector();
     },
@@ -37,6 +37,7 @@ var GameScene = cc.Scene.extend({
         this.physics.step();
 
         this.launcher.update(dt);
+        this.collector.update(dt);
 
         this.timeSinceLaunch += dt;
         if (this.timeSinceLaunch > this.launchDelay) {
@@ -55,27 +56,44 @@ var GameScene = cc.Scene.extend({
         }
 
         for (var i = 0; i < this.balls.length; i++) {
-            this.balls[i].update(dt);
+            var ball = this.balls[i];
+            ball.update(dt);
+
+            var toRemove = (ball.sprite.getPosition().y < (-ball.sprite.getContentSize().height*0.5));
+            if (toRemove) {
+                ball.sprite.removeFromParent();
+                this.physics.destroyBody(ball.body);
+                ball.sprite = null;
+                ball.body = null;
+            }
+        }
+
+        var i = 0;
+        while (i < this.balls.length)
+        {
+            var ball = this.balls[i];
+            if (ball.sprite == null)
+            {
+                this.balls.splice(i, 1);
+            }
+            else
+            {
+                i++;
+            }
         }
     },
 
-    setupWallsAndFloor: function () {
-        var floorVertices = [
-            new cc.Point(0, cc.winSize.height),
-            new cc.Point(0, 0),
-            new cc.Point(cc.winSize.width, 0),
-            new cc.Point(cc.winSize.width, cc.winSize.height)
-        ];
+    setupWalls: function () {
+        var bottomLeft = new cc.Point(0, 0);
+        var topLeft = new cc.Point(0, cc.winSize.height);
+        var bottomRight = new cc.Point(cc.winSize.width, 0);
+        var topRight = new cc.Point(cc.winSize.width, cc.winSize.height);
 
-        for (var i = 0; i < floorVertices.length - 1; i++) {
-            var vertex1 = floorVertices[i];
-            var vertex2 = floorVertices[i + 1];
-
-            this.physics.createEdge(vertex1, vertex2);
-        }
+        this.physics.createEdge(bottomLeft, topLeft);
+        this.physics.createEdge(bottomRight, topRight);
     },
 
-    setupLauncher: function() {
+    setupLauncher: function () {
         this.addChild(this.launcher.sprite);
         this.launcher.sprite.setPosition(cc.winSize.width * 0.5, cc.winSize.height);
         this.launcher.sprite.setAnchorPoint(0.5, 1.0);
@@ -88,7 +106,7 @@ var GameScene = cc.Scene.extend({
             new cc.TintTo(this.launchDelay * 0.2, this.nextBallColor.r, this.nextBallColor.g, this.nextBallColor.b)));
     },
 
-    setupCollector: function() {
+    setupCollector: function () {
         this.addChild(this.collector.mainNode);
     }
 });

@@ -69,3 +69,7 @@ Physics.prototype.createEdge = function (vertex1, vertex2) {
 
     return body;
 };
+
+Physics.prototype.destroyBody = function (body) {
+    this.world.DestroyBody(body);
+}
