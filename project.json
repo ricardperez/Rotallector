@@ -16,12 +16,14 @@
     ],
 
     "jsList" : [
-        "src/app.js",
         "src/Ball.js",
         "src/Collector.js",
+        "src/GameController.js",
         "src/GameScene.js",
+        "src/GameResources.js",
+        "src/GameUI.js",
         "src/Launcher.js",
-        "src/Physics.js",
-        "src/resource.js"
+        "src/MenuScene.js",
+        "src/Physics.js"
     ]
 }

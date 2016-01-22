@@ -72,4 +72,15 @@ Physics.prototype.createEdge = function (vertex1, vertex2) {
 
 Physics.prototype.destroyBody = function (body) {
     this.world.DestroyBody(body);
-}
+};
+
+Physics.prototype.applySmallImpulseToEveryMovingBody = function () {
+    var bodyList = this.world.GetBodyList();
+    var impulseVector = this.screenToPhysics(new cc.Point(0,250));
+    for (var b = bodyList; b != null; b = b.m_next) {
+        if (b.GetLinearVelocity().x == 0.0 && b.GetLinearVelocity().y == 0.0)
+        {
+            b.ApplyImpulse(impulseVector, b.GetPosition());
+        }
+    }
+};

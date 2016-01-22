@@ -3,7 +3,7 @@
  */
 var Launcher = function (physics) {
     this.physics = physics;
-    this.sprite = new cc.Sprite(GameScene.resources.Launcher);
+    this.sprite = new cc.Sprite(GameResources.names.Launcher);
     this.speedX = 100.0;
 
     this.update = function (dt) {

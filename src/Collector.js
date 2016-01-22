@@ -10,7 +10,7 @@ var CollectorBranch = function (physics, pivot, vector) {
 
     var length = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
 
-    this.sprite = new cc.Sprite(GameScene.resources.CollectorBranch)
+    this.sprite = new cc.Sprite(GameResources.names.CollectorBranch)
     this.sprite.setScaleX(length);
 
     this.angle = Math.atan2(vector.y, vector.x);
@@ -46,6 +46,7 @@ var Collector = function (physics, pivotPoint) {
     this.futurePivot = pivotPoint;
     this.angle = 0;
     this.futureAngle = 0;
+    this.physics = physics;
 
     this.touchingAction = TouchingActionEnum.NONE;
 
@@ -71,7 +72,7 @@ var Collector = function (physics, pivotPoint) {
             return me.onTouchEnded(touch, event);
         }
     });
-    cc.eventManager.addListener(touchListener, 1);
+    this.touchListener = cc.eventManager.addListener(touchListener, 1);
 };
 
 var pointsDistanceSq = function(point1, point2)
@@ -162,4 +163,11 @@ Collector.prototype.update = function (dt) {
         var branch = this.branches[i];
         branch.updatePivot(this.pivot, this.angle);
     }
+
+    this.physics.applySmallImpulseToEveryMovingBody();
+};
+
+Collector.prototype.destroy = function ()
+{
+    cc.eventManager.removeListener(this.touchListener);
 }

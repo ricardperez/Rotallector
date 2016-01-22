@@ -5,7 +5,7 @@ var Ball = function (color, position, physics) {
 
     this.physics = physics;
 
-    this.sprite = new cc.Sprite(GameScene.resources.Ball);
+    this.sprite = new cc.Sprite(GameResources.names.Ball);
     this.sprite.setPosition(position);
     this.sprite.setColor(color);
 

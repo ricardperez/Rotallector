@@ -1,2 +1,6 @@
 .DS_Store
 .idea
+frameworks/cocos2d-x/build/
+frameworks/cocos2d-x/cocos/scripting/js-bindings/proj.ios_mac/build/
+frameworks/runtime-src/proj.ios_mac/build/
+simulator/
