@@ -10,7 +10,7 @@ var GameController = function(gameNode) {
     this.timeSinceLaunch = 0;
     this.nextBallColor = null;
     this.launchDelay = 0.75;
-    this.timeLeft = 10.0;
+    this.timeLeft = 25.0;
 
     this.physics = new Physics();
     this.launcher = new Launcher(this.physics);
