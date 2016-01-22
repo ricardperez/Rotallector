@@ -2,35 +2,41 @@
  * Created by ricardperez on 21/01/16.
  */
 
-var CollectorBranch = function (physics, pivot, vector) {
+var CollectorBranch = function (physics, pivot, point1, point2) {
+    this.node = null;
     this.sprite = null;
     this.body = null;
     this.physics = physics;
     this.pivot = pivot;
 
+    var vector = new cc.Point(point2.x - point1.x, point2.y - point1.y);
     var length = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y));
 
-    this.sprite = new cc.Sprite(GameResources.names.CollectorBranch)
+    this.sprite = new cc.Sprite(GameResources.images.collector_branch)
     this.sprite.setScaleX(length);
 
-    this.angle = Math.atan2(vector.y, vector.x);
-    var degrees = this.angle * (180 / Math.PI);
-    this.sprite.setPosition(pivot);
+    angle = Math.atan2(vector.y, vector.x);
+    var degrees = angle * (180 / Math.PI);
+    this.sprite.setPosition(point1);
     this.sprite.setAnchorPoint(new cc.Point(0, 0.5));
     this.sprite.setRotation(-degrees);
 
-    this.body = physics.createEdge(new cc.Point(0, 0), new cc.Point(length, 0));
+    this.body = physics.createEdge(point1, point2);
     this.body.SetPosition(physics.screenToPhysics(pivot));
-    this.body.SetAngle(this.angle);
+    this.body.SetAngle(0);
+
+    this.node = new cc.Node();
+    this.node.setPosition(pivot);
+    this.node.addChild(this.sprite);
 };
 
 CollectorBranch.prototype.updatePivot = function (pivot, angle) {
     this.body.SetPosition(this.physics.screenToPhysics(pivot));
-    this.sprite.setPosition(pivot);
+    this.node.setPosition(pivot);
 
-    var degrees = (this.angle + angle) * (180 / Math.PI);
-    this.sprite.setRotation(-degrees);
-    this.body.SetAngle(this.angle + angle);
+    var degrees = angle * (180 / Math.PI);
+    this.node.setRotation(-degrees);
+    this.body.SetAngle(angle);
 };
 
 var TouchingActionEnum = {
@@ -39,7 +45,7 @@ var TouchingActionEnum = {
     MOVNG: 2
 };
 
-var Collector = function (physics, pivotPoint) {
+var Collector = function (physics, pivotPoint, descriptionJson) {
     this.mainNode = new cc.Node();
     this.branches = [];
     this.pivot = pivotPoint;
@@ -50,13 +56,7 @@ var Collector = function (physics, pivotPoint) {
 
     this.touchingAction = TouchingActionEnum.NONE;
 
-    var branch1 = new CollectorBranch(physics, pivotPoint, new cc.Point(-200, 200));
-    this.mainNode.addChild(branch1.sprite);
-    this.branches.push(branch1);
-
-    var branch2 = new CollectorBranch(physics, pivotPoint, new cc.Point(200, 200));
-    this.mainNode.addChild(branch2.sprite);
-    this.branches.push(branch2);
+    this.createBranches(descriptionJson);
 
     var me = this;
     var touchListener = cc.EventListener.create({
@@ -170,4 +170,24 @@ Collector.prototype.update = function (dt) {
 Collector.prototype.destroy = function ()
 {
     cc.eventManager.removeListener(this.touchListener);
+}
+
+Collector.prototype.createBranches = function (descriptionJson)
+{
+    var me = this;
+    var createBranch = function(point1, vector)
+    {
+        var branch = new CollectorBranch(me.physics, me.pivot, point1, new cc.Point(point1.x+vector.x, point1.y+vector.y));
+        me.mainNode.addChild(branch.node);
+        me.branches.push(branch);
+        return branch;
+    };
+
+    var segmentsJson = descriptionJson["segments"];
+    for (var i=0; i<segmentsJson.length; i++)
+    {
+        var origin = segmentsJson[i]["origin"];
+        var vector = segmentsJson[i]["vector"];
+        createBranch(new cc.Point(origin[0],origin[1]), new cc.Point(vector[0], vector[1]));
+    }
 }

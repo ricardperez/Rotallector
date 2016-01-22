@@ -3585,7 +3585,7 @@ EnvironmentActor.prototype = {
       bindings.arguments.push(arg);
     }
 
-    for (let name of this.obj.names()) {
+    for (let name of this.obj.images()) {
       if (bindings.arguments.some(function exists(element) {
                                     return !!element[name];
                                   })) {

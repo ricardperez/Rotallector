@@ -23,6 +23,7 @@
         "src/GameResources.js",
         "src/GameUI.js",
         "src/Launcher.js",
+        "src/MenuItemButton.js",
         "src/MenuScene.js",
         "src/Physics.js"
     ]

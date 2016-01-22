@@ -4,3 +4,6 @@ frameworks/cocos2d-x/build/
 frameworks/cocos2d-x/cocos/scripting/js-bindings/proj.ios_mac/build/
 frameworks/runtime-src/proj.ios_mac/build/
 simulator/
+frameworks/cocos2d-x/cocos/scripting/js-bindings/proj.ios_mac/cocos2d_js_bindings.xcodeproj/xcuserdata/
+frameworks/runtime-src/proj.ios_mac/Rotallector.xcodeproj/xcuserdata/
+frameworks/runtime-src/proj.ios_mac/Rotallector.xcodeproj/project.xcworkspace/

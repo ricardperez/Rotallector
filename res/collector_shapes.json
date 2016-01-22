@@ -1,0 +1,46 @@
+{
+	"version": 1,
+	"data":
+	[
+		{
+			"name": "shape1",
+			"segments":
+			[
+				{
+					"origin": [0,0],
+					"vector": [150, 150]
+				},
+				{
+					"origin": [0,0],
+					"vector": [-150, 150]
+				}
+			]
+		},
+		{
+			"name": "shape2",
+			"segments":
+			[
+				{
+					"origin": [0,0],
+					"vector": [0, 250]
+				},
+				{
+					"origin": [0,100],
+					"vector": [-150, 150]
+				},
+				{
+					"origin": [0,100],
+					"vector": [150, 150]
+				},
+				{
+					"origin": [0,250],
+					"vector": [-75, 75]
+				},
+				{
+					"origin": [0,250],
+					"vector": [75, 75]
+				}
+			]
+		}
+	]
+}

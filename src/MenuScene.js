@@ -5,43 +5,33 @@ var MenuScene = cc.Scene.extend({
     ctor: function () {
         this._super();
 
-        var size = cc.winSize;
+        var me = this;
+        var createMenuItem = function (title, identifier) {
+            var menuItem = new MenuItemButton(GameResources.images.button_purple, title, function () {
+                me.onMenuItemClicked(identifier)
+            });
+            return menuItem;
+        };
 
-        var helloLabel = new cc.LabelTTF("Hello World", "Arial", 38);
-        helloLabel.x = size.width / 2;
-        helloLabel.y = size.height / 2 + 200;
-        this.addChild(helloLabel, 5);
+        var levelsJson = cc.loader.getRes(GameResources.json.levels_list);
+        this.levelsList = levelsJson["data"];
+        var menuItems = [];
 
-        this.sprite = new cc.Sprite(GameResources.names.HelloWorld_png);
-        this.sprite.attr({
-            x: size.width / 2,
-            y: size.height / 2
-        });
-        this.addChild(this.sprite, 0);
+        for (var i = 0; i < this.levelsList.length; i++) {
+            var level = this.levelsList[i];
+            menuItems.push(createMenuItem(level["level"], i));
+        }
 
-        var button = new ccui.Button(GameResources.names.button_purple);
-        button.setPosition(size.width*0.5, 100);
-        this.addChild(button);
-
-        var startPlayingLabel = new cc.LabelTTF("Start Playing", "Arial", 25);
-        button.addChild(startPlayingLabel);
-        startPlayingLabel.setPosition(button.getContentSize().width*0.5, button.getContentSize().height*0.5);
-
-        button.addTouchEventListener( this.onTouchEvent, this );
+        var menu = new cc.Menu(menuItems);
+        menu.alignItemsVertically();
+        menu.setPosition(cc.winSize.width * 0.5, cc.winSize.height * 0.5);
+        this.addChild(menu);
 
         return true;
     },
 
-    onTouchEvent: function(sender, type)
-    {
-        switch (type)
-        {
-            case ccui.Widget.TOUCH_ENDED:
-                var transitionScene = new cc.TransitionSlideInR(1.0, new GameScene(), false);
-                cc.Director.sharedDirector.runScene(transitionScene);
-                break;
-            default:
-                break;
-        }
-    }
+    onMenuItemClicked: function (identifier) {
+        var transitionScene = new cc.TransitionSlideInR(1.0, new GameScene(this.levelsList[identifier]), false);
+        cc.Director.sharedDirector.runScene(transitionScene);
+    },
 });

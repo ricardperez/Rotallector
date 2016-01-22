@@ -2,19 +2,21 @@
  * Created by ricardperez on 22/01/16.
  */
 
-var GameController = function(gameNode) {
+var GameController = function(gameNode, levelData) {
     this.gameNode = gameNode;
     this.physics = null;
     this.launcher = null;
     this.balls = [];
     this.timeSinceLaunch = 0;
     this.nextBallColor = null;
-    this.launchDelay = 0.75;
-    this.timeLeft = 25.0;
+    this.launchDelay = levelData["launcherTime"];
+    this.timeLeft = levelData["duration"];
+
+    var collectorJson = this.getCollectorJson(levelData);
 
     this.physics = new Physics();
-    this.launcher = new Launcher(this.physics);
-    this.collector = new Collector(this.physics, new cc.Point(cc.winSize.width * 0.5, 100));
+    this.launcher = new Launcher(this.physics, levelData["launcherSpeed"]);
+    this.collector = new Collector(this.physics, new cc.Point(cc.winSize.width * 0.5, 100), collectorJson);
 
     this.setupWalls();
     this.setupLauncher();
@@ -115,3 +117,26 @@ GameController.prototype.isFinished = function () {
 GameController.prototype.destroy = function () {
     this.collector.destroy();
 };
+
+GameController.prototype.getCollectorJson = function (levelData) {
+    var collectorShapeName = levelData["collectorShape"];
+    var collectorShapesListJson = cc.loader.getRes(GameResources.json.collector_shapes);
+    var collectorShapeJson = null;
+    var found = false;
+    for (var i=0; i<collectorShapesListJson["data"].length; i++)
+    {
+        collectorShapeJson = collectorShapesListJson["data"][i];
+        if (collectorShapeJson["name"] == collectorShapeName)
+        {
+            found = true;
+            break;
+        }
+    }
+
+    if (found)
+    {
+        return collectorShapeJson;
+    }
+
+    return null;
+}

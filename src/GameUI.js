@@ -73,25 +73,8 @@ var GameUI = cc.Layer.extend({
         ));
 
 
-        var button = new ccui.Button(GameResources.names.button_purple);
+        var button = new Button(GameResources.images.button_purple, "Back", finishLambda);
         button.setPosition(layer.getContentSize().width*0.5, layer.getContentSize().height * 0.2);
         layer.addChild(button);
-
-        var buttonLabel = new cc.LabelTTF("Back", "Arial", 25);
-        button.addChild(buttonLabel);
-        buttonLabel.setPosition(button.getContentSize().width*0.5, button.getContentSize().height*0.5);
-
-        layer.onTouchEvent = function(sender, type)
-        {
-            switch (type)
-            {
-                case ccui.Widget.TOUCH_ENDED:
-                    finishLambda();
-                    break;
-                default:
-                    break;
-            }
-        };
-        button.addTouchEventListener(layer.onTouchEvent, layer);
     }
 });

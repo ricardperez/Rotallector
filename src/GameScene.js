@@ -6,15 +6,16 @@ var GameScene = cc.Scene.extend({
     gameController: null,
     finished: false,
 
-    ctor: function () {
+    ctor: function (levelData) {
         this._super();
 
         var whiteBackgroundLayer = new cc.LayerColor(new cc.Color(255, 255, 255), this.getContentSize().width, this.getContentSize().height);
         this.addChild(whiteBackgroundLayer);
 
-        this.gameController = new GameController(this);
+        this.gameController = new GameController(this, levelData);
 
         this.ui = new GameUI();
+        this.ui.updateTimeLeft(this.gameController.getTimeLeft());
         this.addChild(this.ui, 100);
     },
 
