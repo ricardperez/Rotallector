@@ -5,7 +5,7 @@ var Physics = function () {
     this.scalePhysicsToScreen = 32;
     this.scaleScreenToPhysics = (1.0 / this.scalePhysicsToScreen);
 
-    var gravity = new Box2D.Common.Math.b2Vec2(0, -9.8);
+    var gravity = new Box2D.Common.Math.b2Vec2(0, -20);
     var doSleep = true;
     this.world = new Box2D.Dynamics.b2World(gravity, doSleep);
 };
@@ -30,8 +30,8 @@ Physics.prototype.createBallBody = function (radius, screenPosition) {
     var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
     fixtureDef.shape = shape;
     fixtureDef.density = 10.0;
-    fixtureDef.restitution = 0.4;
-    fixtureDef.friction = 0.0;
+    fixtureDef.restitution = 0.0;
+    fixtureDef.friction = 1.0;
 
     var bodyDef = new Box2D.Dynamics.b2BodyDef();
     bodyDef.type = Box2D.Dynamics.b2Body.b2_dynamicBody;
@@ -58,7 +58,8 @@ Physics.prototype.createEdge = function (vertex1, vertex2) {
 
     var fixtureDef = new Box2D.Dynamics.b2FixtureDef();
     fixtureDef.shape = shape;
-    fixtureDef.restitution = 0.5;
+    fixtureDef.restitution = 0.0;
+    fixtureDef.friction = 1.0;
 
     var bodyDef = new Box2D.Dynamics.b2BodyDef();
     bodyDef.type = Box2D.Dynamics.b2Body.b2_staticBody;

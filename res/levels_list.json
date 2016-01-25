@@ -4,8 +4,8 @@
 	[
 		{
 			"level": "Level 1",
-			"duration": 10,
-			"launcherTime": 0.7,
+			"duration": 25,
+			"launcherTime": 0.5,
 			"launcherSpeed": 200,
 			"collectorShape": "shape1"
 		},
