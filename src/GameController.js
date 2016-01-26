@@ -17,6 +17,7 @@ var GameController = function(gameNode, levelData) {
     this.physics = new Physics();
     this.launcher = new Launcher(this.physics, levelData["launcherSpeed"]);
     this.collector = new Collector(this.physics, new cc.Point(cc.winSize.width * 0.5, 100), collectorJson);
+    this.physics.collisionsManager.registerCollector(this.collector);
 
     this.setupWalls();
     this.setupLauncher();
@@ -37,6 +38,7 @@ GameController.prototype.update = function(dt)
             var ball = this.launcher.launchBall(this.nextBallColor);
             this.balls.push(ball);
             this.gameNode.addChild(ball.sprite);
+            this.physics.collisionsManager.registerBall(ball);
 
             this.nextBallColor = Ball.Colors[Math.floor(Math.random() * Ball.Colors.length)];
 
@@ -56,10 +58,8 @@ GameController.prototype.update = function(dt)
 
         var toRemove = (ball.sprite.getPosition().y < (-ball.sprite.getContentSize().height * 0.5));
         if (toRemove) {
-            ball.sprite.removeFromParent();
-            this.physics.destroyBody(ball.body);
-            ball.sprite = null;
-            ball.body = null;
+            this.physics.collisionsManager.unregisterBall(ball);
+            ball.destroy();
         }
     }
 
@@ -85,8 +85,8 @@ GameController.prototype.setupWalls = function()
     var bottomRight = new cc.Point(cc.winSize.width, 0);
     var topRight = new cc.Point(cc.winSize.width, cc.winSize.height);
 
-    this.physics.createEdge(bottomLeft, topLeft);
-    this.physics.createEdge(bottomRight, topRight);
+    this.physics.createEdgeBody(bottomLeft, topLeft);
+    this.physics.createEdgeBody(bottomRight, topRight);
 };
 
 GameController.prototype.setupLauncher = function () {

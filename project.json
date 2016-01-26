@@ -18,6 +18,7 @@
     "jsList" : [
         "src/Ball.js",
         "src/Collector.js",
+        "src/CollisionsManager.js",
         "src/GameController.js",
         "src/GameScene.js",
         "src/GameResources.js",

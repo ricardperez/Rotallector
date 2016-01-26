@@ -15,6 +15,13 @@
 			"launcherTime": 0.7,
 			"launcherSpeed": 200,
 			"collectorShape": "shape2"
+		},
+		{
+			"level": "Level 3",
+			"duration": 25,
+			"launcherTime": 0.2,
+			"launcherSpeed": 200,
+			"collectorShape": "shape2"
 		}
 	]
 }
